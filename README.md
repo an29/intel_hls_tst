@@ -1,1 +1,3 @@
-# intel_hls_tst
+# Simple example for Intel FPGA HLS
+
+
