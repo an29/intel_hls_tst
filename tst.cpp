@@ -3,17 +3,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define COUNT 30
+#define COUNT 1000
 
 typedef ihc::stream_in<  float, ihc::usesPackets<true> > ast_pkt_snk;
 typedef ihc::stream_out< float, ihc::usesPackets<true> > ast_pkt_src;
 
-typedef struct amm_csr {
+typedef struct {
   float sub;
   float mult;
-};
+} amm_csr;
 
-hls_avalon_slave_component
 component
 void mult( ast_pkt_snk& a, 
            ast_pkt_snk& b, 
@@ -50,9 +49,18 @@ int main(void){
 
   mult( a, b, c, arg );
 
-  printf("Check:\n");
+  float res = 0;
+  float expect = 0;
+  printf("Check\n");
   for( int i = 0; i < COUNT; i++){
-    printf( "(%e * %e - %e) * %e = %e\n", a_tmp[i], b_tmp[i], arg.sub, arg.mult, c.read() );
+    res = c.read();
+    expect = ( a_tmp[i] * b_tmp[i] - arg.sub ) * arg.mult;
+
+    if( expect != res ){
+      printf( "Error[%d]: ", i );
+      printf( "(%e * %e - %e) * %e = %e\n", a_tmp[i], b_tmp[i], arg.sub, arg.mult, res );
+    }
   }
+  printf( "End\n" );
   return 0;  
 }
